@@ -1,0 +1,316 @@
+package coba.pak.bayu;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
+import java.util.Random;
+import java.sql.*;
+
+import java.util.LinkedHashSet;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+/**
+ *
+ * @author Recky Davinci
+ */
+public class CobaPakBayu {
+
+    public static Connection conn;
+
+    public static Statement cn;
+    public static ResultSet rs;
+
+    public static void koneksi() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/coba", "root", "");
+            cn = conn.createStatement();
+            System.out.println("Koneksi Sukses");
+
+        } catch (Exception e) {
+            System.out.println("Koneksi Gagal");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void insert(int no, String title, String isi_content, String href) {
+        try {
+            String insert = "INSERT INTO berita VALUES('" + no + "','" + title + "','" + isi_content + "','" + href + "','http://www.uinsby.ac.id/news/id',now());";
+            //System.out.println(insert);
+            cn.executeUpdate(insert);
+
+        } catch (Exception e) {
+            System.out.println("Gagal Mas");
+            System.out.println(e.getMessage());
+
+        }
+    }
+
+    public static void insert_pengumuman(int no, String title, String author, String tgl, String href) {
+        try {
+            String insert = "INSERT INTO pengumuman VALUES('" + no + "','" + title + "','" + author + "','" + tgl + "','" + href + "','http://www.uinsby.ac.id/pengumuman/id',now());";
+            //System.out.println(insert);
+            cn.executeUpdate(insert);
+
+        } catch (Exception e) {
+            System.out.println("Gagal Mas");
+            System.out.println(e.getMessage());
+
+        }
+    }
+
+    public static void insert_agenda(int no, String title, String tgl, String acara, String href) {
+        try {
+            String insert = "INSERT INTO agenda VALUES('" + no + "','" + title + "','" + tgl + "','" + acara + "','" + href + "','http://www.uinsby.ac.id/agenda/id',now());";
+            //System.out.println(insert);
+            cn.executeUpdate(insert);
+
+        } catch (Exception e) {
+            System.out.println("Gagal Mas");
+            System.out.println(e.getMessage());
+
+        }
+    }
+    public static void insert_kolom(int no,String title, String author, String tgl, String acara, String href) {
+        try {
+            String insert = "INSERT INTO kolom VALUES('" + no + "','"+title+"','"+author+"','" + tgl + "','" + acara + "','" + href + "','http://www.uinsby.ac.id/agenda/id',now());";
+            //System.out.println(insert);
+            cn.executeUpdate(insert);
+
+        } catch (Exception e) {
+            System.out.println("Gagal Mas");
+            System.out.println(e.getMessage());
+
+        }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws IOException {
+        //koneksi();
+
+//        Document d = Jsoup.connect("http://www.wikihow.com/wikiHowTo?search=Signal+Wifi").timeout(6000).get();
+//        Elements ele = d.select("div#searchresults_list");
+//        for (Element element : ele.select("div.result")) {
+//            String img_url  = element.select("div.result_thumb img").attr("src");
+//            System.out.println(img_url);
+//            
+//            String title = element.select("div.result_data a").text();
+//            System.out.println(title);
+//        }
+//        
+
+///////////////////  BERITA
+        Document d = Jsoup.connect("coba.html").timeout(10000).get();
+        Elements ele = d.select("div#isi-content");
+        int no = 1;
+        for (Element element : ele.select("div.event-ancor1")) {
+            String img_url = element.select("div.event-ancor1 a").attr("href");
+            //System.out.println(img_url);
+            Document w = Jsoup.connect(img_url).timeout(6000).get();
+            Elements as = w.select("div#level-right");
+            String title = element.select("div.event-ancor1 h3").text();
+            for (Element el : w.select("div#bawah-baca")) {
+                String conten = el.select("div#bawah-baca p").text();
+                //System.out.println(conten);
+                String title1 = title.replaceAll("'", "*");
+                String conten1 = conten.replaceAll("'", "*");
+                String img_url1 = img_url.replaceAll("'", "*");
+                insert(no,title1,conten1,img_url1);
+                no++;
+            }
+            
+            //System.out.println(title); http://localhost/coba/pengumuman.html
+        }
+
+/////////////// PENGUMUMAN 
+//        d = Jsoup.connect("http://localhost/coba/pengumuman.html").timeout(10000).get();
+//        ele = d.select("div#isi-content");
+//        no = 1 ;
+//        for (Element element : ele.select("div.event-ancor1")) {
+//            String img_url = element.select("div.event-ancor1 a").attr("href");
+//            //System.out.println(img_url);
+//            String title = element.select("div.event-ancor1 h3").text();
+//            String author = element.select("div.author").text();
+//            String tgl = element.select("div.date-news").text();
+//            //System.out.println(conten);
+//            String title1 = title.replaceAll("'", "*");
+//            String img_url1 = img_url.replaceAll("'", "*");
+//            String author1 = author.replaceAll("'", "*");
+////            insert_pengumuman(no,title1,author1,tgl,img_url1);
+//            System.out.println("title");
+//            System.out.println(title1);
+//            System.out.println("author");
+//            System.out.println(author1);
+//            System.out.println("tgl publish");
+//            System.out.println(tgl);
+//            System.out.println("href");
+//            System.out.println(img_url1);
+//            no++;
+//
+//            //System.out.println(title); 
+//        }
+/////////////// Agenda 
+//        d = Jsoup.connect("http://localhost/coba/agenda.html").timeout(10000).get();
+//        ele = d.select("div#isi-content");
+//        no = 1;
+//        for (Element element : ele.select("div.event-ancor1")) {
+//            String img_url = element.select("div.event-ancor1 a").attr("href");
+//            //System.out.println(img_url);
+//            Document w = Jsoup.connect(img_url).timeout(6000).get();
+//            Elements as = w.select("div#level-right");
+//            String tgl = element.select("div.date-news").text();
+//            String title = element.select("div.event-ancor1 h3").text();
+//            for (Element el : w.select("div#bawah-baca")) {
+//                String conten = el.select("div#bawah-baca p").text();
+//                //System.out.println(conten);preview-content
+//                String title1 = title.replaceAll("'", "*");
+//                String conten1 = conten.replaceAll("'", "*");
+//                String img_url1 = img_url.replaceAll("'", "*");
+//                insert_agenda(no, title1, tgl, conten1,img_url1);
+////                System.out.println("title");
+////                System.out.println(title1);
+////                System.out.println("tgl_publish");
+////                System.out.println(tgl);
+////                System.out.println("acara");
+////                System.out.println(conten1);
+////                System.out.println("href");
+////                System.out.println(img_url1);
+//
+//                no++;
+//            }
+//
+//            //System.out.println(title); http://localhost/coba/pengumuman.html
+//        }
+
+        
+/////////////// Kolom 
+//        d = Jsoup.connect("http://localhost/coba/kolom.html").get();
+//        ele = d.select("div#isi-content");
+//        no = 1;
+//        for (Element element : ele.select("div.event-ancor1")) {
+//            String img_url = element.select("div.event-ancor1 a").attr("href");
+//            //System.out.println(img_url);
+//            Document w = Jsoup.connect(img_url).get();
+//            Elements as = w.select("div#level-right");
+//            String tgl = element.select("div.date-news").text();
+//            String author = element.select("div.author").text();
+//            String title = element.select("div.event-ancor1 h3").text();
+//            for (Element el : w.select("div#bawah-baca")) {
+//                String conten = el.select("div#bawah-baca p").text();
+//                //System.out.println(conten);preview-content
+//                String title1 = title.replaceAll("'", "*");
+//                String conten1 = conten.replaceAll("'", "*");
+//                String img_url1 = img_url.replaceAll("'", "*");
+//                insert_kolom(no,title1, author, tgl, conten1,img_url1);
+////                System.out.println("title");
+////                System.out.println(title1);
+////                System.out.println("author");
+////                System.out.println(author);
+////                System.out.println("tgl_publish");
+////                System.out.println(tgl);
+////                System.out.println("acara");
+////                System.out.println(conten1);
+////                System.out.println("href");
+////                System.out.println(img_url1);
+//
+//                no++;
+//            }
+//
+//            //System.out.println(title); http://localhost/coba/pengumuman.html
+//        }
+        
+//      d = Jsoup.connect("http://www.uinsby.ac.id/").get();
+//        ele = d.select("div#header");
+//        no = 1;
+//        for (Element element : ele.select("div.superfish")) {
+//            String img_url = element.select("div.sf-mega-section a").text();
+//            System.out.println(img_url);
+//            System.out.println(no);
+//            Document w = Jsoup.connect(img_url).get();
+//            Elements as = w.select("div#level-right");
+//            String tgl = element.select("div.date-news").text();
+//            String author = element.select("div.author").text();
+//            String title = element.select("div.event-ancor1 h3").text();
+//            for (Element el : w.select("div#bawah-baca")) {
+//                String conten = el.select("div#bawah-baca p").text();
+//                //System.out.println(conten);preview-content
+//                String title1 = title.replaceAll("'", "*");
+//                String conten1 = conten.replaceAll("'", "*");
+//                String img_url1 = img_url.replaceAll("'", "*");
+//                insert_kolom(no,title1, author, tgl, conten1,img_url1);
+////                System.out.println("title");
+////                System.out.println(title1);
+////                System.out.println("author");
+////                System.out.println(author);
+////                System.out.println("tgl_publish");
+////                System.out.println(tgl);
+////                System.out.println("acara");
+////                System.out.println(conten1);
+////                System.out.println("href");
+////                System.out.println(img_url1);
+//
+//                no++;
+//            }
+
+            //System.out.println(title); http://localhost/coba/pengumuman.html
+//        }
+        // TODO code application logic here
+//        Integer[] arr = new Integer[25];
+//    for (int i = 0; i < arr.length; i++) {
+//        arr[i] = i+1;
+//    }
+//        int aw = 1;
+//        for (int i = 0; i < arr.length; i++) {
+//            if (i % 4 ==0) {
+//                System.out.println("Kelompok "+aw);
+//
+//            }
+//            
+//            System.out.println(arr[i]);
+//        }
+//        Document doc ;
+//        doc = (Document) Jsoup.connect("http://uinsby.ac.id").get();
+//        System.out.println(doc);
+//        Elements links = doc.getElementsByTag("body a");
+//        for (Element link:links){
+//            String l = link.attr("href");
+//            if (l.length()>0) {
+//                if (l.length()<4) {
+//                    l = doc.baseUri()+l.substring(1);
+//                }else if (!l.substring(0, 4).equals("http")) {
+//                     l = doc.baseUri()+l.substring(1);
+//                }
+//                System.out.println(l);
+//                
+//            }
+//        }
+//Document doc = Jsoup.connect("http://uinsby.ac.id").get();
+//Elements newsHeadlines = doc.select("#mp-itn b a");
+//Elements links = doc.select("body a");
+//        System.out.println(links);
+//Document doc = Jsoup.connect("http://uinsby.ac.id").get();
+//Elements links = doc.select("body http");
+//Element head = doc.select("body").first();
+//        System.out.println(links);
+//// mencari Title 
+//Document html = Jsoup.parse("http://uinsby.ac.id");
+//        String title = html.title();
+//        Document doc;
+//        try {
+//            doc = Jsoup.connect("http://www.uinsby.ac.id/news/id/12556/gema-sholawat-di-penutupan-pkk-mb-uinsa-2016").get();
+//            title = doc.title();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(title);
+    }
+
+}
