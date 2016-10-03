@@ -1,0 +1,294 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package coba.pak.bayu;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Enumeration;
+import java.util.Scanner;
+import java.util.Vector;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+
+/**
+ *
+ * @author Recky Davinci
+ */
+public class tugas2 {
+
+    public static String kata[];
+    private static String newkata[];
+    public static Connection conn;
+    public static Statement cn;
+    public static ResultSet rs;
+    public static  String kata_terpilih = "saya";;
+    public static Vector <String> total_kolom = new Vector ();
+    public static Vector <String> tf = new Vector ();
+    public static Vector <Double> tfidf = new Vector ();
+    public static double jumlah_kata_perkolom =0;
+    
+    
+    public static void tfidf2(double no) {
+        tfidf.add(no);
+    }
+    public static void jajal(int askata, int asnewkata) {
+        kata = new String[askata];
+        newkata = new String[asnewkata];
+    }
+    public static void simpan_vektor(String teks) {
+        total_kolom.add(teks);
+    }
+    public static void total_tf(String teks) {
+        tf.add(teks);
+    }
+    public static void jumlahkatakolom() {
+        jumlah_kata_perkolom++;
+    }
+   
+    public static boolean cekKata(int n, String x) {
+        boolean ketemu = false;
+
+        for (int i = 0; i < n; i++) {
+            // jika ada yg sama 
+            if (kata[i].equalsIgnoreCase(x)) {
+                ketemu = true;
+                break;
+            }
+        }
+        return ketemu;
+    }
+
+    public static void as(String teks,int no) {
+        Hashtable as = new Hashtable();
+        teks = teks.toLowerCase();
+        for (int ui = 0; ui < 10; ui++) {
+            String we = Integer.toString(ui);
+            teks = teks.replace(we, "");
+        }
+        teks = replace(teks);
+        String temp = "";
+        boolean ketemu = false;
+        int a, k, n, m, count = 0, jum;
+        // inputan dari keyboard   
+//        teks = as();
+
+//        System.out.println("text");
+//        System.out.println(teks);
+//      
+        int s = 0;
+        String[] er = new String[1100];
+        StringTokenizer aas = new StringTokenizer(teks, " ");
+        while (aas.hasMoreElements()) {
+//            aas.nextToken();
+            er[s] = aas.nextToken();
+            s++;
+        }
+        jajal(s, s);
+//        System.out.println("s");
+//        System.out.println(s);
+        //menentukan kata  
+        for (int i = 0; i < teks.length(); i++) {
+            //jika ditemukan spasi
+            if (count == s) {
+                break;
+
+            }
+            if (teks.charAt(i) == ' ') {
+                count += 1;
+                temp = "";
+            } else {
+                temp = temp + teks.charAt(i);
+                kata[count] = temp;
+//                System.out.println(count + "\t" + temp);
+            }
+
+//            System.out.println("countt");
+//            System.out.println(count);
+        }
+//        System.out.println("kata");
+//        System.out.println(kata.length);
+//        for (int i = 0; i < kata.length; i++) {
+//            System.out.println(i+"\t"+kata[i]);
+//        }
+
+//        System.out.println(teks.length());
+//        String dh = teks.substring(6000, 6042);
+//        System.out.println(dh);
+        n = count + 1;// banyaknya kata dlm suatu kalimat  
+        n = s;
+        // eliminasi kata yang sama  
+        k = 0;
+        a = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (!cekKata(a, kata[i])) {  
+                newkata[k] = kata[i];
+//                System.out.println("s " + s);
+//                System.out.println("n " + n);
+//                System.out.println("i "+i);
+//                System.out.println("a "+a);
+//                System.out.println(kata[i] + "\t" + newkata[k]);
+
+                k++;
+            }
+            a++;
+        }
+        m = k; // banyaknya kata yg tlah dieliminasi  
+//        System.out.println("m");
+//        System.out.println(m);
+//        System.out.println(k);
+//        System.out.println(n);
+//        System.out.println(kata.length);
+//        System.out.println(newkata.length);
+        // proses penghitungan kata dalam suatu kalimat  
+        for (int i = 0; i < m; i++) {
+            if (i == count) {
+                break;
+            }
+            jum = 0;
+            for (int j = 0; j < n; j++) {
+                if (newkata[i].equalsIgnoreCase(kata[j])) {
+                    jum += 1;
+                }
+            }
+            as.put(newkata[i], String.valueOf(jum));
+        }
+        Enumeration e = as.keys();
+        Enumeration es = as.elements();
+        double simpan_a = 0;
+        double jumlah_kata=0;
+        
+        double jum_kata_dipilih=0;
+        String simpan_b = "";
+        String total_kata = "";
+        while (e.hasMoreElements() && es.hasMoreElements()) {
+//            System.out.print("."+String.valueOf(e.nextElement())+".");
+//            System.out.println("\t" + String.valueOf(es.nextElement()));
+            String key = (String) e.nextElement();
+            String val = (String) es.nextElement();
+            double valu = Integer.parseInt(val);
+//            System.out.print(key+"\t");
+//            System.out.println(val);
+            total_kata = total_kata + key+"\t"+val+"\n";
+            jumlah_kata = jumlah_kata + valu;
+            if (simpan_a < valu) {
+                simpan_a = valu;
+                simpan_b = key;
+            }
+            if (key.equalsIgnoreCase(kata_terpilih)) {
+                jum_kata_dipilih = valu;
+                jumlahkatakolom();
+            }
+
+        }
+       
+        int jum_kata_dipilih2 = (int) jum_kata_dipilih;
+        int jumlah_kata2 = (int) jumlah_kata;
+        double hitung_tf = jum_kata_dipilih/jumlah_kata;
+        tfidf2(hitung_tf);
+        String teks_tf = "tf('"+kata_terpilih+"',d"+no+") = "+jum_kata_dipilih2+"/"+jumlah_kata2+" = "+hitung_tf;
+        total_kata = total_kata +"Jumlah\t"+jumlah_kata2+"\n";
+        simpan_vektor(total_kata);
+        total_tf(teks_tf);
+        
+        
+//System.out.println(jum_kata_dipilih);
+//        System.out.println("terbanyak");
+//        System.out.println(simpan_a);
+//        System.out.println(simpan_b);
+        //String jml = "Kata : " + simpan_b + "\t Jumlah : " + simpan_a;
+
+//     System.out.println("new kata");
+//     for (int i = 0; i < newkata.length; i++) {
+//         System.out.println(newkata[i]);
+//     }
+//     System.out.println("kata tok");
+//     for (int i = 0; i < kata.length; i++) {
+//         System.out.println(kata[i]);
+//     }
+       // return jml;
+    }
+
+    public static String replace(String teks) {
+        teks = teks.replace("& ", "");
+        teks = teks.replace("/ ", "");
+        teks = teks.replace("-", "");
+        teks = teks.replace(")", "");
+        teks = teks.replace("!", "");
+        teks = teks.replace("`", "");
+        teks = teks.replace(":", "");
+        teks = teks.replace(".", "");
+        teks = teks.replace(". ", "");
+        teks = teks.replace(",", "");
+        teks = teks.replace("  ", " ");
+        teks = teks.replace("   ", " ");
+        teks = teks.replace("    ", " ");
+        teks = teks.replace("     ", " ");
+
+        return teks;
+    }
+
+    public static void main(String args[]) {
+        
+//        String SQL = "SELECT * FROM kolom ";
+//        ResultSet rs = KoneksiDB.executeQuery(SQL);
+//        String teks = "";
+//        try {
+//            while (rs.next()) {
+//                teks=rs.getString(1);
+//                
+//                if (teks.equalsIgnoreCase("8")) {
+//                    break;
+//                } else {
+//                    teks = rs.getString(5);
+//                    System.out.println(rs.getString(1));
+//                    System.out.println(as(teks));
+//
+//                }
+//            }
+//        } catch (SQLException ex) {
+//            //Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+        String teks = "saya suka apel dan saya senang manggis dan kamu jelek";
+        String teks2 = "saya cinta kamu ";
+        String teks3 = "cinta ";
+       
+        Vector <String> simpan_kata = new Vector();
+        simpan_kata.add(teks);
+        simpan_kata.add(teks2);
+        simpan_kata.add(teks3);
+       
+        for (int i = 0; i < simpan_kata.size(); i++) { 
+            as(simpan_kata.get(i),(i+1));
+        }
+        for (int i = 0; i < total_kolom.size(); i++) {
+            System.out.println("Kolom ke "+(i+1));
+            System.out.println(total_kolom.get(i));
+        }
+        for (int i = 0; i < tf.size(); i++) {
+            System.out.println(tf.get(i));
+        }
+//        System.out.println("jumlh");
+//        System.out.println(jumlah_kata_perkolom);
+        double jumlah_kolom = simpan_kata.size();
+        double hasil = Math.log10(jumlah_kolom/jumlah_kata_perkolom);
+        int jumlah_kolom2 = (int) jumlah_kolom;
+        int jumlah_kata_perkolom2 = (int) jumlah_kata_perkolom;
+        System.out.println("");
+        System.out.println("idf('"+kata_terpilih+"',D) = log "+jumlah_kolom2+"/"+jumlah_kata_perkolom2+" = "+hasil );
+        //array  
+
+        for (int i = 0; i < tfidf.size(); i++) {
+            System.out.println("tfidf('"+kata_terpilih+"',d"+(i+1)+" = tf('"+kata_terpilih+"',d"+(i+1)+" x idf('"+kata_terpilih+"',D) = "+tfidf.get(i)+" x "+hasil+" = "+(tfidf.get(i)*hasil));
+        }
+        //   as.put("as", String.valueOf(2));
+        // inisialisasi variabel  
+    }
+
+}
